@@ -2,7 +2,9 @@ import { Component, OnInit, Input, ViewChild, NgZone, } from '@angular/core';
 import { MapsAPILoader, AgmMap } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 
+
 declare var google: any;
+
 
 interface Marker {
   lat: number;
@@ -12,8 +14,8 @@ interface Marker {
 }
 
 interface Location {
-  lat: number;
-  lng: number;
+  lat: any;
+  lng: any;
   viewport?: Object;
   zoom: number;
   address_level_1?:string;
@@ -23,24 +25,26 @@ interface Location {
   address_state?: string;
   marker?: Marker;
 }
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
 
+
+
 export class MapComponent implements OnInit {
   
+  public currentLocation={latitude:'',longitude:''};
 
   geocoder:any;
-  circleRadius:number = 5000;
+  // circleRadius:number = 5000;
   public location:Location = {
-    lat: 12.9716,
-    lng: 77.5946,
+    lat: '',
+    lng: '',
     marker: {
-      lat: 12.9716,
-      lng: 77.5946,
+      lat: 12.930951100000001,
+      lng: 77.6328304,
       draggable: true
     },
     zoom: 5
@@ -48,7 +52,13 @@ export class MapComponent implements OnInit {
  
   @ViewChild(AgmMap) map: AgmMap;
   
-
+  setPosition(position){
+    this.currentLocation = position.coords;
+    this.location.lat=this.currentLocation.latitude;
+    this.location.lng=this.currentLocation.longitude;
+    console.log(position.coords);
+    console.log(this.currentLocation.latitude,this.currentLocation.longitude);
+    }
 
 
 
@@ -147,13 +157,13 @@ export class MapComponent implements OnInit {
       }
     }
   }
-  milesToRadius(value) {
-    this.circleRadius = value / 0.00062137;
- }
+//   milesToRadius(value) {
+//     this.circleRadius = value / 0.00062137;
+//  }
 
- circleRadiusInMiles() {
-   return this.circleRadius * 0.00062137;
- }
+//  circleRadiusInMiles() {
+//    return this.circleRadius * 0.00062137;
+//  }
 
 
   constructor(public mapsApiLoader: MapsAPILoader,
@@ -168,6 +178,10 @@ export class MapComponent implements OnInit {
    }
 
   ngOnInit() {
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(this.setPosition.bind(this));
+      };
+   
     this.location.marker.draggable = true;
 
   }
